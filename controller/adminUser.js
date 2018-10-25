@@ -45,6 +45,7 @@ router.post('/login',async(req,res,next)=>{
                     req.session.user = user
                     res.json({
                         code:200,
+                        data:user,
                         msg:'登录成功'
                     })
                 }else{
@@ -67,6 +68,20 @@ router.post('/login',async(req,res,next)=>{
         }
     } catch (error) {
         next(error)
+    }
+})
+
+router.get('/',async(req,res,next)=>{
+    try {
+        const data = await adminUserModel.find()
+        .select('-password')
+        res.json({
+            code:200,
+            data,
+            msg:'请求成功'
+        })
+    } catch (error) {
+        next(error)    
     }
 })
 
