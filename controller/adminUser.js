@@ -7,7 +7,7 @@ router.post('/',auth,async(req,res,next)=>{
     try {
         let {
             username,
-            nicknama,
+            nickname,
             avatar,
             password,
             desc,
@@ -17,7 +17,7 @@ router.post('/',auth,async(req,res,next)=>{
         }=req.body;
         const data = await adminUserModel.create({
             username,
-            nicknama,
+            nickname,
             avatar,
             password,
             desc,
@@ -85,5 +85,32 @@ router.get('/',async(req,res,next)=>{
     }
 })
 
+router.get('/:id',async(req,res,next)=>{
+    try {
+        const _id = req.params
+        const data = await adminUserModel.findById({_id})
+        res.json({
+            code:200,
+            msg:'请求成功',
+            data
+        })
+    } catch (error) {
+        next(error)
+    }
+})
+
+router.delete('/',auth,async(req,res,next)=>{
+    try {
+        const _id = req.query.id
+        const data = await adminUserModel.deleteOne({_id})
+        res.json({
+            code:200,
+            msg:'删除成功',
+            data
+        })
+    } catch (error) {
+        next(error)
+    }
+})
 
 module.exports = router

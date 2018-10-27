@@ -6,7 +6,7 @@ const adminUser = new mongoose.Schema({
         required:true,
         unique:true
     },
-    nicknama:String,
+    nickname:String,
     avatar:String,
     password:{
         type:String,
