@@ -3,6 +3,7 @@ const router = Router()
 const adminUserModel = require('../model/adminUser')
 const auth = require('./auth')
 
+
 router.post('/',auth,async(req,res,next)=>{
     try {
         let {
@@ -71,15 +72,35 @@ router.post('/login',async(req,res,next)=>{
     }
 })
 
-router.get('/',async(req,res,next)=>{
+router.post('/logout',async(req,res,next)=>{
     try {
-        const data = await adminUserModel.find()
-        .select('-password')
+        req.session.user = null
         res.json({
             code:200,
-            data,
-            msg:'请求成功'
+            msg:'退出登录'
         })
+    } catch (error) {
+        next(error)
+    }
+})
+
+router.get('/',async(req,res,next)=>{
+    try {
+        let count = await adminUserModel.count()
+        let {page = 1, page_size = 10} = req.query
+        page = parseInt(page)
+        page_size = parseInt(page_size)
+        const data = await adminUserModel.find()
+            .skip((page-1)*page_size)
+            .limit(page_size)
+            .sort({_id: -1})
+            .select('-password')
+            res.json({
+                code:200,
+                data,
+                count,
+                msg:'请求成功'
+            })
     } catch (error) {
         next(error)    
     }
@@ -113,4 +134,37 @@ router.delete('/',auth,async(req,res,next)=>{
     }
 })
 
+router.put('/:id',async(req,res,next)=>{
+    try {
+        const {id} = req.params 
+        let {
+            username,
+            nickname,
+            avatar,
+            desc,
+            job,
+            phone,
+            sex
+        }=req.body
+        const user = await adminUserModel.findById({_id:id})
+        const UpData = user.UpDataOne({
+            $set:{
+                username,
+                nickname,
+                avatar,
+                desc,
+                job,
+                phone,
+                sex
+            }
+        })
+        res.json({
+            code:200,
+            data:UpData,
+            msg:'修改成功'
+        })
+    } catch (error) {
+        next(error)
+    }
+})
 module.exports = router

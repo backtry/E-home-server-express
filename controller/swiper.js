@@ -32,11 +32,21 @@ router.post('/',auth,async(req,res,next)=>{
 
 router.get('/',async(req,res,next)=>{
     try {
+        let count = await SwiperModule.count()
+        let {page = 1, page_size = 10} = req.query
+        page = parseInt(page)
+        page_size = parseInt(page_size)
         const data = await SwiperModule.find()
-        .sort({_id:-1})
+        .skip((page-1)*page_size)
+        .limit(page_size)
+        .sort({sort:-1})
+        .populate({
+            path:'newsId',
+        })
         res.json({
             code:200,
             data,
+            count,
             msg:'获取成功'
         })
     } catch (error) {
@@ -48,6 +58,9 @@ router.get('/:id',async(req,res,next)=>{
     try {
         const {id} = req.params
         const data = await SwiperModule.findById({_id:id})
+        .populate({
+            path:'newsId',
+        })
         res.json({
             code:200,
             data,
